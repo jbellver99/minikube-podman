@@ -55,7 +55,7 @@ MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_c
 # ---------------------------------	
 echo "starting minikube.."
 
-minikube start --container-runtime=cri-o --cpus 4 --memory $(((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).sum - 6gb) /1mb)
+minikube start --container-runtime=cri-o --cpus 4 --memory $(((((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).sum - 8gb) /1mb), 1800 | Measure -Max).Maximum)
 
 MSG_ERROR -step "starting minikube" -return_code $?	
 # ---------------------------------	
