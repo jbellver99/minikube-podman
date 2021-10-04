@@ -18,5 +18,5 @@ while ($test -eq 0)
 
 minikube ssh "cd /tmp_${relative_path}; sudo podman $args"
 $RET=$?
-Write-Host "The build has terminated, you can close the powershell window use to share folders with the VM"
+Write-Host "The build has terminated, you can close the powershell window used to share folders with the VM"
 exit $RET
