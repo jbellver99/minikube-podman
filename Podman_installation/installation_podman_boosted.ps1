@@ -68,9 +68,10 @@ echo "& minikube -p minikube podman-env | Invoke-Expression" | out-file C:\Users
 echo "`$env:Path += `";C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1;;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`""  >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 echo "Set-Alias docker podman"  >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 echo "Set-Alias podman-compose C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_compose_Windows_part.ps1"  >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-echo "Set-Alias minikube_save_images C:\Users\tipaty\Downloads\podman-2.2.1\save_images.ps1" >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-echo "Set-Alias minikube_load_images C:\Users\tipaty\Downloads\podman-2.2.1\load_images.ps1" >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-echo "Set-Alias copy_registry_conf C:\Users\tipaty\Downloads\podman-2.2.1\copy_registry_conf.ps1" >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+echo "Set-Alias minikube_save_images C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\save_images.ps1" >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+echo "Set-Alias minikube_load_images C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\load_images.ps1" >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+echo "Set-Alias copy_registry_conf C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\copy_registry_conf.ps1" >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+echo "Set-Alias podman C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_arg_check.ps1" >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 MSG_ERROR -step "writing in the profile file: " -return_code $?	
 # ---------------------------------	
 echo "loading the profile"
