@@ -10,7 +10,7 @@ while ($test -eq 0)
 	{
 		$test=1
 	}else{
-		echo "chare is not sucessful yet, checking again in some seconds"
+		echo "share is not sucessful yet, checking again in some seconds"
 		echo "--"
 		sleep 2
 	}
