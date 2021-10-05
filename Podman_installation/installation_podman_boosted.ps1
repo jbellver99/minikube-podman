@@ -55,7 +55,7 @@ MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_c
 # ---------------------------------	
 echo "starting minikube.."
 
-minikube start --container-runtime=cri-o --cpus 4 --memory 3500 --disk-size '40000mb'
+minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory 3500 --disk-size '40000mb'
 
 MSG_ERROR -step "starting minikube" -return_code $?	
 # ---------------------------------	
