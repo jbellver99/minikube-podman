@@ -30,9 +30,9 @@ if (-not $ret)
 
 $old_path=$(pwd | Select-Object -ExpandProperty Path)
 $image_list=$(minikube ssh "sudo podman image ls -n --format 'table {{.Repository}}:{{.Tag}}'")
-if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1)
+if (Test-Path C:\Users\$($env:USERNAME)\tmp_images)
 {
-	echo "The directory C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1 already exists, its creation is skipped"
+	echo "The directory C:\Users\$($env:USERNAME)\tmp_images already exists, its creation is skipped"
 }else{
 	New-Item -Type directory "C:\Users\$($env:USERNAME)\tmp_images"
 }
