@@ -88,13 +88,18 @@ else
 	MSG_ERROR -step "creating C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1" -return_code $?
 }
 # ---------------------------------
-echo "downloading the Podman archive"
-Invoke-WebRequest -Uri https://github.com/containers/podman/releases/download/v2.2.1/podman-remote-release-windows.zip -OutFile C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip
-MSG_ERROR -step "downloading the Podman archive" -return_code $?
-# ---------------------------------------------------------
-echo "extracting podman archive"
-Expand-Archive "C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip" -DestinationPath "C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1"
-MSG_ERROR -step "extracting podman archive" -return_code $?
+if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman.exe)
+{
+  echo "The podman.exe file already exists, skipping the donwload of the archive"
+}else{
+  echo "downloading the Podman archive"
+  Invoke-WebRequest -Uri https://github.com/containers/podman/releases/download/v2.2.1/podman-remote-release-windows.zip -OutFile C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip
+  MSG_ERROR -step "downloading the Podman archive" -return_code $?
+  # ---------------------------------------------------------
+  echo "extracting podman archive"
+  Expand-Archive "C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip" -DestinationPath "C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1"
+  MSG_ERROR -step "extracting podman archive" -return_code $?
+}
 # -----------------------------------------------------
 echo "copy the podman-compose and uninstallation scripts in the podman folder"
 cp ./scripts/* C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1
