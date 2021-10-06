@@ -127,7 +127,7 @@ New-Item -Type File -Force $PROFILE
 MSG_ERROR -step "creating powershell profile" -return_code $?
 # ---------------------------------
 echo "writing in the profile file: " $profile
-echo "& minikube -p minikube podman-env | Invoke-Expression" | out-file C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+echo "& C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\profile_check.ps1" | out-file C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 echo "`$env:Path += `";C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1;;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`""  >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 echo "Set-Alias docker podman"  >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 echo "Set-Alias podman-compose C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_compose_Windows_part.ps1"  >> $PROFILE
