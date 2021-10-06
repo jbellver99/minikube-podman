@@ -21,7 +21,8 @@
 # ex : 				Timothé Paty							20/09/2021	adding something because of a reason
 #
 ######################################################################################################
-
+$podman_folder="${ENV:APPDATA}\podman-2.2.1"
+$podman_folder_bin="${podman_folder}\bin"
 if ($args -contains '-h' -or $args -contains '--help')
 {
 	echo "temporary solution to use podman-compose with a windows podman configured with minikube, waiting for podman3 included in minikube."
@@ -44,7 +45,7 @@ if ($args -contains '-h' -or $args -contains '--help')
 
 function MSG_ERROR {
  param( [string]$step, $return_code)
- if ($return_code) 
+ if ($return_code)
  {
 	Write-Host "step: $step has succeed" -ForegroundColor Green
 	echo "--"
@@ -56,7 +57,7 @@ function MSG_ERROR {
 	Write-Host "stopping the script..." -ForegroundColor Red
 	Write-Host "the script has failed" -ForegroundColor Red
 	exit 1
- }	
+ }
 }
 
 
@@ -88,7 +89,7 @@ echo "copying current directory into the tmp folder"
 cp -r -Force . C:\Users\$($env:USERNAME)\tmp_share_windows
 MSG_ERROR -step "copying current directory into the tmp folder" -return_code $?
 echo "copying bash scripts in the same folder"
-cp C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\*.bash C:\Users\$($env:USERNAME)\tmp_share_windows
+cp ${podman_folder_bin}\*.bash C:\Users\$($env:USERNAME)\tmp_share_windows
 MSG_ERROR -step "copying bash scripts in the same folder" -return_code $?
 echo "copying the key to connect to the VM from the container"
 $path=$(minikube ssh-key)

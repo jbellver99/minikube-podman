@@ -1,5 +1,5 @@
 ######################################################################################################
-# Creation: XX/09/2021 
+# Creation: XX/09/2021
 # Description: 	Script to uninstall podman on windows.
 #
 ######################################################################################################
@@ -8,9 +8,12 @@
 #
 ######################################################################################################
 
+$podman_folder="${ENV:APPDATA}\podman-2.2.1"
+$podman_folder_bin="${podman_folder}\bin"
+
 function MSG_ERROR {
  param( [string]$step, $return_code)
- if ($return_code) 
+ if ($return_code)
  {
 	Write-Host "step: $step has succeed" -ForegroundColor Green
 	echo "--"
@@ -24,7 +27,7 @@ function MSG_ERROR {
 	Write-Host "Press any key to close window..."
 	($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
 	exit
- }	
+ }
 }
 
 $date_save=$(Get-Date -Format "yyyyMMdd.HHmm")
@@ -41,7 +44,7 @@ minikube delete
 MSG_ERROR -step "removing the minikube VM" -return_code $?
 #------------------------------------------------
 echo "removing podman"
-rm -r C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1
+rm -r $podman_folder_bin
 MSG_ERROR -step "removing podman" -return_code $?
 #------------------------------------------------
 echo "removing podman-remote-release-windows.zip"

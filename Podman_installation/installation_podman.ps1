@@ -10,7 +10,15 @@
 ####################################################################################################
 
 param( [int]$memory=0, [int]${storage}=0)
+
+
+#intialazing variables
+$podman_folder="${ENV:APPDATA}\podman-2.2.1"
+$podman_folder_bin="${podman_folder}\bin"
 $memory_used_dynamic=0
+
+
+
 if ($storage -eq 0)
 {
   echo "No disk size given, the VM will be created with the default value: 20000 MB"
@@ -77,18 +85,18 @@ function MSG_ERROR {
 }
 
 
-echo "creating C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1"
-if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1)
+echo "creating $podman_folder and $podman_folder_bin"
+if (Test-Path $podman_folder_bin)
 {
 	echo "directory already exists, step skipped"
 }
 else
 {
-	New-Item -Type directory "C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1"
-	MSG_ERROR -step "creating C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1" -return_code $?
+	New-Item -Type directory "$podman_folder_bin"
+	MSG_ERROR -step "creating $podman_folder and $podman_folder_bin" -return_code $?
 }
 # ---------------------------------
-if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman.exe)
+if (Test-Path ${podman_folder_bin}\podman.exe)
 {
   echo "The podman.exe file already exists, skipping the donwload of the archive"
 }else{
@@ -97,12 +105,12 @@ if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman.exe)
   MSG_ERROR -step "downloading the Podman archive" -return_code $?
   # ---------------------------------------------------------
   echo "extracting podman archive"
-  Expand-Archive "C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip" -DestinationPath "C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1"
+  Expand-Archive "C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip" -DestinationPath "$podman_folder_bin"
   MSG_ERROR -step "extracting podman archive" -return_code $?
 }
 # -----------------------------------------------------
 echo "copy the podman-compose and uninstallation scripts in the podman folder"
-cp ./scripts/* C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1
+cp ./scripts/* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
 MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_code $?
 # ---------------------------------
 echo "starting minikube.."
@@ -126,15 +134,15 @@ echo "creating powershell profile"
 New-Item -Type File -Force $PROFILE
 MSG_ERROR -step "creating powershell profile" -return_code $?
 # ---------------------------------
-echo "writing in the profile file: " $profile
-echo "& C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\profile_check.ps1" | out-file C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-echo "`$env:Path += `";C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1;;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`""  >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-echo "Set-Alias docker podman"  >> C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
-echo "Set-Alias podman-compose C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_compose_Windows_part.ps1"  >> $PROFILE
-echo "Set-Alias minikube_save_images C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\save_images.ps1" >> $PROFILE
-echo "Set-Alias minikube_load_images C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\load_images.ps1" >> $PROFILE
-echo "Set-Alias copy_registry_conf C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\copy_registry_conf.ps1" >> $PROFILE
-echo "Set-Alias podman C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_arg_check.ps1" >> $PROFILE
+echo "writing in the profile file: " $PROFILE
+echo "& ${podman_folder_bin}\profile_check.ps1" >> $PROFILE
+echo "`$env:Path += `";${podman_folder_bin};;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`""  >> $PROFILE
+echo "Set-Alias docker podman"  >> $PROFILE
+echo "Set-Alias podman-compose ${podman_folder_bin}\podman_compose_Windows_part.ps1"  >> $PROFILE
+echo "Set-Alias minikube_save_images ${podman_folder_bin}\save_images.ps1" >> $PROFILE
+echo "Set-Alias minikube_load_images ${podman_folder_bin}\load_images.ps1" >> $PROFILE
+echo "Set-Alias copy_registry_conf ${podman_folder_bin}\copy_registry_conf.ps1" >> $PROFILE
+echo "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" >> $PROFILE
 MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
 echo "loading the profile"
