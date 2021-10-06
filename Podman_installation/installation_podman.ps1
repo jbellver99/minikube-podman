@@ -9,15 +9,15 @@
 
 ####################################################################################################
 
-param( [int]$memory=0, [int]${size}=0)
+param( [int]$memory=0, [int]${storage}=0)
 $memory_used_dynamic=0
-if ($size -eq 0)
+if ($storage -eq 0)
 {
   echo "No disk size given, the VM will be created with the default value: 20000 MB"
-  $size_used=20000
+  $storage_used=20000
 }else{
-  echo "The disk size will be $size MB"
-  $size_used=$size
+  echo "The disk size will be $storage MB"
+  $storage_used=$storage
 }
 if ($args -contains "-d" -and $memory -ne 0)
 {
@@ -107,7 +107,7 @@ MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_c
 # ---------------------------------
 echo "starting minikube.."
 
-minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $size_used
+minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used
 
 MSG_ERROR -step "starting minikube" -return_code $?
 
