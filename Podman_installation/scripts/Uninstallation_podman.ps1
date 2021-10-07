@@ -48,8 +48,13 @@ rm -r $podman_folder_bin
 MSG_ERROR -step "removing podman" -return_code $?
 #------------------------------------------------
 echo "removing podman-remote-release-windows.zip"
-rm -r C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip
-MSG_ERROR -step "removing podman-remote-release-windows.zip" -return_code $?
+if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip)
+{
+  rm -r C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip
+  MSG_ERROR -step "removing podman-remote-release-windows.zip" -return_code $?
+}else{
+  Write-Host "The archive 'podman-remote-release-windows.zip' was not found in 'C:\Users\$($env:USERNAME)\Downloads', its removal is skipped" -ForegroundColor Yellow
+}
 Write-Host "Uninstallation succeded" -ForegroundColor Green
 Write-Host "Press any key to close window..."
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null

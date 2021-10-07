@@ -146,7 +146,7 @@ echo "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" >> $PROFILE
 MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
 echo "loading the profile"
-$PROFILE
+& $PROFILE
 MSG_ERROR -step "loading the profile" -return_code $?
 Write-Host "installation succeed" -ForegroundColor Green
 Write-Host "Press any key to close window..."
