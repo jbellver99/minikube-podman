@@ -26,7 +26,7 @@ function MSG_ERROR {
 
 function Check_copy_file {
  param( [string]$filename)
- if ((Test-Path ${podman_folder_bin}\${filename}) -and (-not ($filename -match ".conf")))
+ if ((Test-Path ${podman_folder_bin}\${filename}) -and (-not ($filename -match ".conf$")))
  {
    $compare=$(compare-object (get-content ${podman_folder_bin}\${filename}) (get-content ${scripts_folder}\${filename}))
    if ($compare.length -ne 0)
