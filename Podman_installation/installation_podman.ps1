@@ -15,6 +15,7 @@ param( [int]$memory=0, [int]${storage}=0)
 #intialazing variables
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
+$folder_of_installation_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $memory_used_dynamic=0
 
 
@@ -110,7 +111,7 @@ if (Test-Path ${podman_folder_bin}\podman.exe)
 }
 # -----------------------------------------------------
 echo "copy the podman-compose and uninstallation scripts in the podman folder"
-cp ./scripts/* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
+cp ${folder_of_installation_script}\scripts\* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
 MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_code $?
 # ---------------------------------
 echo "starting minikube.."
