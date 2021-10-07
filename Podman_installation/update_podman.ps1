@@ -17,7 +17,7 @@ function MSG_ERROR {
  {
 	Write-Host "a problem occured in the step: $step" -ForegroundColor Red
 	Write-Host "stopping the script..." -ForegroundColor Red
-	Write-Host "the installation has failed" -ForegroundColor Red
+	Write-Host "the update has failed" -ForegroundColor Red
 	Write-Host "Press any key to close window..."
 	($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
 	exit
@@ -118,3 +118,6 @@ check_line_in_profile -test_line "Set-Alias minikube_load_images" -full_line "Se
 check_line_in_profile -test_line "Set-Alias copy_registry_conf" -full_line "Set-Alias copy_registry_conf C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\copy_registry_conf.ps1" -content $profile_content
 check_line_in_profile -test_line "Set-Alias podman C" -full_line "Set-Alias podman C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_arg_check.ps1" -content $profile_content
 Write-Host "The profile has been updated" -ForegroundColor DarkCyan
+echo "-------------------------------------------------------------"
+Write-Host "the update has succeed" -ForegroundColor Green
+Write-Host "Press any key to close window..."
