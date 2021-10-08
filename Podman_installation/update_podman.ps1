@@ -120,4 +120,5 @@ check_line_in_profile -test_line "Set-Alias podman C" -full_line "Set-Alias podm
 Write-Host "The profile has been updated" -ForegroundColor DarkCyan
 echo "-------------------------------------------------------------"
 Write-Host "the update has succeed" -ForegroundColor Green
+($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
 Write-Host "Press any key to close window..."
