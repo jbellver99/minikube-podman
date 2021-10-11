@@ -10,6 +10,8 @@
 
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
+$profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_podman.ps1"
+$ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\podman_client.lnk"
 
 function MSG_ERROR {
  param( [string]$step, $return_code)
@@ -32,20 +34,38 @@ function MSG_ERROR {
 
 $date_save=$(Get-Date -Format "yyyyMMdd.HHmm")
 echo "Uninstallation of podman"
-echo "Deleting profile C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1, (there is a save under the name C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile.$($date_save) (if it still exists)"
-if (Test-Path C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1)
+echo "Deleting profile $profile_podman"
+if (Test-Path $profile_podman)
 {
-mv C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile.$date_save
-}
+rm $profile_podman
 MSG_ERROR -step "deleting profile" -return_code $?
-#------------------------------------------------
+}else{
+  Write-Host "the profile $profile_podman was not found, its removal has been skipped" -ForegroundColor Yellow
+}
+
+#-----------------------------------------------
+echo "deleting shortcut"
+if (Test-Path $ShortcutLocation)
+{
+rm $ShortcutLocation
+MSG_ERROR -step "deleting shortcut" -return_code $?
+}else{
+  Write-Host "the shortcut $ShortcutLocation was not found, its removal has been skipped" -ForegroundColor Yellow
+}
+# #------------------------------------------------
 echo "stopping and removing the minikube VM"
 minikube delete
 MSG_ERROR -step "removing the minikube VM" -return_code $?
 #------------------------------------------------
-echo "removing podman"
-rm -r $podman_folder_bin
-MSG_ERROR -step "removing podman" -return_code $?
+echo "removing podman folder"
+if (Test-Path $podman_folder_bin)
+{
+  rm -r $podman_folder_bin
+  MSG_ERROR -step "removing podman" -return_code $?
+}else{
+  Write-Host "the folder $podman_folder_bin was not found, its removal has been skipped" -ForegroundColor Yellow
+}
+
 #------------------------------------------------
 echo "removing podman-remote-release-windows.zip"
 if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip)

@@ -156,8 +156,16 @@ echo "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" >> $profile_po
 MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
 # creating shortcut
-$SourceFileLocation = “$env:SystemRoot\System32\notepad.exe”
-$ShortcutLocation = “C:\Users\thiyagu.a.selvaraj\Desktop\Notepad.lnk”
+$SourceFileLocation = 'C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe'
+$args="-noexit `"& $profile_podman`""
+$ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\podman_client.lnk"
+echo "Creating the shortcut at: $ShortcutLocation"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
+$Shortcut.TargetPath = $SourceFileLocation
+$Shortcut.Arguments = $args
+$Shortcut.Save()
+MSG_ERROR -step "Creating shortcut: $ShortcutLocation" -return_code $?
 # ---------------------------------
 echo "loading the profile"
 & $profile_podman
