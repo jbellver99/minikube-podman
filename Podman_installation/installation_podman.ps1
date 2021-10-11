@@ -157,7 +157,7 @@ MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
 # creating shortcut
 $SourceFileLocation = 'C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe'
-$args="-noexit `"& $profile_podman`""
+$args="-noexit -file $profile_podman"
 $ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\podman_client.lnk"
 echo "Creating the shortcut at: $ShortcutLocation"
 $WScriptShell = New-Object -ComObject WScript.Shell
