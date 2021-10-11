@@ -17,6 +17,7 @@ $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
 $folder_of_installation_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $memory_used_dynamic=0
+$profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_podman.ps1"
 
 # Check if we run it as Administrator, in this case we stop the script
 $user = [Security.Principal.WindowsIdentity]::GetCurrent();
@@ -140,22 +141,26 @@ if ($memory_used_dynamic -ne 0)
 }
 # ---------------------------------
 echo "creating powershell profile"
-New-Item -Type File -Force $PROFILE
+New-Item -Type File -Force $profile_podman
 MSG_ERROR -step "creating powershell profile" -return_code $?
 # ---------------------------------
-echo "writing in the profile file: " $PROFILE
-echo "& ${podman_folder_bin}\profile_check.ps1" >> $PROFILE
-echo "`$env:Path += `";${podman_folder_bin};;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`""  >> $PROFILE
-echo "Set-Alias docker podman"  >> $PROFILE
-echo "Set-Alias podman-compose ${podman_folder_bin}\podman_compose_Windows_part.ps1"  >> $PROFILE
-echo "Set-Alias minikube_save_images ${podman_folder_bin}\save_images.ps1" >> $PROFILE
-echo "Set-Alias minikube_load_images ${podman_folder_bin}\load_images.ps1" >> $PROFILE
-echo "Set-Alias copy_registry_conf ${podman_folder_bin}\copy_registry_conf.ps1" >> $PROFILE
-echo "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" >> $PROFILE
+echo "writing in the profile file: " $profile_podman
+echo "& ${podman_folder_bin}\profile_check.ps1" >> $profile_podman
+echo "`$env:Path += `";${podman_folder_bin};;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`""  >> $profile_podman
+echo "Set-Alias docker podman"  >> $profile_podman
+echo "Set-Alias podman-compose ${podman_folder_bin}\podman_compose_Windows_part.ps1"  >> $profile_podman
+echo "Set-Alias minikube_save_images ${podman_folder_bin}\save_images.ps1" >> $profile_podman
+echo "Set-Alias minikube_load_images ${podman_folder_bin}\load_images.ps1" >> $profile_podman
+echo "Set-Alias copy_registry_conf ${podman_folder_bin}\copy_registry_conf.ps1" >> $profile_podman
+echo "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" >> $profile_podman
 MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
+# creating shortcut
+$SourceFileLocation = “$env:SystemRoot\System32\notepad.exe”
+$ShortcutLocation = “C:\Users\thiyagu.a.selvaraj\Desktop\Notepad.lnk”
+# ---------------------------------
 echo "loading the profile"
-& $PROFILE
+& $profile_podman
 MSG_ERROR -step "loading the profile" -return_code $?
 Write-Host "installation succeed" -ForegroundColor Green
 Write-Host "Press any key to close window..."

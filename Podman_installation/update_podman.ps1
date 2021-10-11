@@ -4,6 +4,7 @@ $podman_folder_bin="${podman_folder}\bin"
 $podman_folder_bin_regex=$podman_folder_bin -replace "\\","\\"
 $folder_of_update_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $scripts_folder = "${folder_of_update_script}\scripts"
+$profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_podman.ps1"
 
 function MSG_ERROR {
  param( [string]$step, $return_code)
@@ -56,8 +57,8 @@ function check_line_in_profile
   $test=$(echo $content | Select-string "$test_line")
   if ($test.length -eq 0)
   {
-    echo "$full_line" >> $PROFILE
-    MSG_ERROR -step "Adding the line about '$test_line' into the profile: $PROFILE" -return_code $?
+    echo "$full_line" >> $profile_podman
+    MSG_ERROR -step "Adding the line about '$test_line' into the profile: $profile_podman" -return_code $?
   }else{
     echo "Line about '$test_line' already exists"
   }
@@ -108,15 +109,39 @@ Write-Host "All scripts have been updated" -ForegroundColor DarkCyan
 echo "-------------------------------------------------------------"
 
 #update of the profile
+if ( -not (Test-Path $profile_podman))
+{
+  write-host "We can see that the new podman profile has not been created yet, after this, to use podman you need to execute the shortcut 'podman_client' on your Desktop " -ForegroundColor DarkCyan
+  echo "Modifying profile: all lines about podman are removed from the powershell profile to create a personal profile when using the shortcut for podman (a save of the profile exists here: $podman_save)"
+  cat $PROFILE | Select-String "podman" > $profile_podman
+  $podman_save="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_before_update_podman.$date_save"
+  mv -Force $PROFILE $podman_save
+  cat $podman_save  | Select-String "podman" -NotMatch > $PROFILE
+
+  $SourceFileLocation = 'C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe'
+  $args="-noexit `"& $profile_podman`""
+  $ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\podman_client.lnk"
+  echo "Creating the shortcut at: $ShortcutLocation"
+  $WScriptShell = New-Object -ComObject WScript.Shell
+  $Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
+  $Shortcut.TargetPath = $SourceFileLocation
+  $Shortcut.Arguments = $args
+  $Shortcut.Save()
+  MSG_ERROR -step "Creating shortcut: $ShortcutLocation" -return_code $?
+  write-host "NOTE: Now to use podman you need to execute the shortcut: $ShortcutLocation, just opening a powershell prompt will not work"
+
+}
 Write-Host "Updating profile: $PROFILE" -ForegroundColor DarkCyan
-$profile_content=$(Get-content $PROFILE)
+$profile_content=$(Get-content $profile_podman)
 check_line_in_profile -test_line "profile_check.ps1" -full_line "& C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\profile_check.ps1" -content $profile_content
+check_line_in_profile -test_line '^[$env:Path]' -full_line "`$env:Path += `";${podman_folder_bin};;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`"" -content $profile_content
 check_line_in_profile -test_line "Set-Alias docker podman" -full_line "Set-Alias docker podman" -content $profile_content
 check_line_in_profile -test_line "Set-Alias podman-compose" -full_line "Set-Alias podman-compose C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_compose_Windows_part.ps1" -content $profile_content
 check_line_in_profile -test_line "Set-Alias minikube_save_images" -full_line "Set-Alias minikube_save_images C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\save_images.ps1" -content $profile_content
 check_line_in_profile -test_line "Set-Alias minikube_load_images" -full_line "Set-Alias minikube_load_images C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\load_images.ps1" -content $profile_content
 check_line_in_profile -test_line "Set-Alias copy_registry_conf" -full_line "Set-Alias copy_registry_conf C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\copy_registry_conf.ps1" -content $profile_content
 check_line_in_profile -test_line "Set-Alias podman C" -full_line "Set-Alias podman C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman_arg_check.ps1" -content $profile_content
+
 Write-Host "The profile has been updated" -ForegroundColor DarkCyan
 echo "-------------------------------------------------------------"
 Write-Host "the update has succeed" -ForegroundColor Green
