@@ -18,7 +18,15 @@ $podman_folder_bin="${podman_folder}\bin"
 $folder_of_installation_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $memory_used_dynamic=0
 
-
+# Check if we run it as Administrator, in this case we stop the script
+$user = [Security.Principal.WindowsIdentity]::GetCurrent();
+if ((New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator))
+{
+  Write-Host "The script must be running without administrators right, please execute it in a new powershell prompt" -ForegroundColor Red
+  Write-Host "Press any key to close window..."
+  ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
+  exit
+}
 
 if ($storage -eq 0)
 {
