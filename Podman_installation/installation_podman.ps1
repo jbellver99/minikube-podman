@@ -85,7 +85,19 @@ function MSG_ERROR {
  }
 }
 
-
+echo "Creating the internal virtual switch"
+Get-NetAdapter -Name "vEthernet (Minikube)" > $null -ErrorAction 'silentlycontinue'
+$v = $?
+if ($v)
+{
+    echo "The internal virtual switch already exists, step skipped"
+}
+else
+{
+    New-VMSwitch -Name "Minikube" -SwitchType Internal
+    MSG_ERROR -step "Creating the internal virtual switch" -return_code $?
+}
+# ---------------------------------
 echo "creating $podman_folder and $podman_folder_bin"
 if (Test-Path $podman_folder_bin)
 {
@@ -116,7 +128,7 @@ MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_c
 # ---------------------------------
 echo "starting minikube.."
 
-minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used
+minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used --hyperv-virtual-switch "Minikube"
 
 MSG_ERROR -step "starting minikube" -return_code $?
 
