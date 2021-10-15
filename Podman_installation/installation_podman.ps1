@@ -114,7 +114,7 @@ cp ${folder_of_installation_script}\scripts\* $podman_folder_bin ; if ($?) {mv -
 MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_code $?
 # ---------------------------------
 echo "Creating the internal virtual switch"
-Get-NetAdapter -Name "vEthernet (Minikube)" > $null -ErrorAction 'silentlycontinue'
+Get-NetAdapter -Name "vEthernet (Minikube_VM)" > $null -ErrorAction 'silentlycontinue'
 $v = $?
 if ($v)
 {
@@ -122,7 +122,7 @@ if ($v)
 }
 else
 {
-    New-VMSwitch -Name "Minikube" -SwitchType Internal
+    New-VMSwitch -Name "Minikube_VM" -SwitchType Internal
     Start-Process -wait powershell "${podman_folder_bin}\enable_ICS.ps1" -Verb runAs
     MSG_ERROR -step "Creating the internal virtual switch" -return_code $?
 }
