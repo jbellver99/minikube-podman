@@ -94,7 +94,6 @@ function MSG_ERROR {
  }
 }
 
-
 echo "creating $podman_folder and $podman_folder_bin"
 if (Test-Path $podman_folder_bin)
 {
@@ -123,9 +122,23 @@ echo "copy the podman-compose and uninstallation scripts in the podman folder"
 cp ${folder_of_installation_script}\scripts\* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
 MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_code $?
 # ---------------------------------
+echo "Creating the internal virtual switch"
+Get-NetAdapter -Name "vEthernet (Minikube_VM)" > $null -ErrorAction 'silentlycontinue'
+$v = $?
+if ($v)
+{
+    echo "The internal virtual switch already exists, step skipped"
+}
+else
+{
+    New-VMSwitch -Name "Minikube_VM" -SwitchType Internal
+    Start-Process -wait powershell "${podman_folder_bin}\enable_ICS.ps1" -Verb runAs
+    MSG_ERROR -step "Creating the internal virtual switch" -return_code $?
+}
+# ---------------------------------
 echo "starting minikube.."
 
-minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used
+minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used --hyperv-virtual-switch "Minikube"
 
 MSG_ERROR -step "starting minikube" -return_code $?
 
