@@ -166,6 +166,9 @@ $Shortcut.TargetPath = $SourceFileLocation
 $Shortcut.Arguments = $args
 $Shortcut.Save()
 MSG_ERROR -step "Creating shortcut: $ShortcutLocation" -return_code $?
+#----------------------------------
+echo "Adding the option : 'open podman here' on right click"
+start-process -wait powershell "${folder_of_installation_script}\Create_right_click_option.ps1" -verb runAs 
 # ---------------------------------
 echo "loading the profile"
 & $profile_podman

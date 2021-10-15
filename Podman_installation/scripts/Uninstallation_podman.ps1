@@ -75,6 +75,11 @@ if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.
 }else{
   Write-Host "The archive 'podman-remote-release-windows.zip' was not found in 'C:\Users\$($env:USERNAME)\Downloads', its removal is skipped" -ForegroundColor Yellow
 }
+
+#------------------------------------------------
+echo "removing the key in the registry to remove the option 'open podman here'"
+start-process -wait powershell "rm HKCU:\SOFTWARE\Classes\Directory\Background\shell\podman -R" -verb runAs
+MSG_ERROR -step "removing the key in the registry to remove the option 'open podman here'" -return_code $?
 Write-Host "Uninstallation succeded" -ForegroundColor Green
 Write-Host "Press any key to close window..."
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
