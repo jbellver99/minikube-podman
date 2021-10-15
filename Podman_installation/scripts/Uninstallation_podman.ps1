@@ -11,7 +11,7 @@
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
 $profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_podman.ps1"
-$ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\podman_client.lnk"
+$ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\Podman_Client.lnk"
 
 function MSG_ERROR {
  param( [string]$step, $return_code)
