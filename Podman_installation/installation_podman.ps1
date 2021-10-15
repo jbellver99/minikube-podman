@@ -138,7 +138,7 @@ else
 # ---------------------------------
 echo "starting minikube.."
 
-minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used --hyperv-virtual-switch "Minikube"
+minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used --hyperv-virtual-switch "Minikube_VM"
 
 MSG_ERROR -step "starting minikube" -return_code $?
 
