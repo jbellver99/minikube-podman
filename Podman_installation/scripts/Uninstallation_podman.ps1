@@ -38,26 +38,26 @@ echo "Deleting profile $profile_podman"
 if (Test-Path $profile_podman)
 {
 rm $profile_podman
-MSG_ERROR -step "deleting profile" -return_code $?
+MSG_ERROR -step "Deleting profile" -return_code $?
 }else{
   Write-Host "the profile $profile_podman was not found, its removal has been skipped" -ForegroundColor Yellow
 }
 
 #-----------------------------------------------
-echo "deleting shortcut"
+echo "Deleting shortcut"
 if (Test-Path $ShortcutLocation)
 {
 rm $ShortcutLocation
-MSG_ERROR -step "deleting shortcut" -return_code $?
+MSG_ERROR -step "Deleting shortcut" -return_code $?
 }else{
   Write-Host "the shortcut $ShortcutLocation was not found, its removal has been skipped" -ForegroundColor Yellow
 }
 # #------------------------------------------------
-echo "stopping and removing the minikube VM"
+echo "Stopping and removing the minikube VM"
 minikube delete
-MSG_ERROR -step "removing the minikube VM" -return_code $?
+MSG_ERROR -step "Removing the minikube VM" -return_code $?
 #------------------------------------------------
-echo "removing podman folder"
+echo "Removing podman folder"
 if (Test-Path $podman_folder_bin)
 {
   rm -r $podman_folder_bin
@@ -67,17 +67,27 @@ if (Test-Path $podman_folder_bin)
 }
 
 #------------------------------------------------
-echo "removing podman-remote-release-windows.zip"
+echo "Removing podman-remote-release-windows.zip"
 if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip)
 {
   rm -r C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip
-  MSG_ERROR -step "removing podman-remote-release-windows.zip" -return_code $?
+  MSG_ERROR -step "Removing podman-remote-release-windows.zip" -return_code $?
 }else{
   Write-Host "The archive 'podman-remote-release-windows.zip' was not found in 'C:\Users\$($env:USERNAME)\Downloads', its removal is skipped" -ForegroundColor Yellow
 }
 
 #------------------------------------------------
-echo "removing the key in the registry to remove the option 'open podman here'"
+echo "Removing ICS"
+Start-Process -wait powershell "${podman_folder_bin}\disable_ICS.ps1" -Verb runAs
+MSG_ERROR -step "Removing ICS" -return_code $?
+
+#------------------------------------------------
+echo "Removing the virtual switch"
+Remove-VMSwitch -Name "Minikube_VM" 
+MSG_ERROR -step "Removing the virtual switch" -return_code $?
+
+#------------------------------------------------
+echo "Removing the key in the registry to remove the option 'open podman here'"
 start-process -wait powershell "rm HKCU:\SOFTWARE\Classes\Directory\Background\shell\podman -R" -verb runAs
 MSG_ERROR -step "removing the key in the registry to remove the option 'open podman here'" -return_code $?
 Write-Host "Uninstallation succeded" -ForegroundColor Green
