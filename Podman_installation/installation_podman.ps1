@@ -123,7 +123,7 @@ if ($v)
 else
 {
     New-VMSwitch -Name "Minikube" -SwitchType Internal
-    Start-Process -wait powershell "$(podman_folder_bin)\enable_ICS.ps1" -Verb runAs
+    Start-Process -wait powershell "${podman_folder_bin}\enable_ICS.ps1" -Verb runAs
     MSG_ERROR -step "Creating the internal virtual switch" -return_code $?
 }
 # ---------------------------------
