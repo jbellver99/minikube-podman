@@ -17,7 +17,7 @@ $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
 $folder_of_installation_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $memory_used_dynamic=0
-$profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_podman.ps1"
+$podman_profile="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
 
 # Check if we run it as Administrator, in this case we stop the script
 $user = [Security.Principal.WindowsIdentity]::GetCurrent();
@@ -121,6 +121,7 @@ if (Test-Path ${podman_folder_bin}\podman.exe)
 echo "copy the podman-compose and uninstallation scripts in the podman folder"
 cp ${folder_of_installation_script}\scripts\* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
 MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_code $?
+mv -Force $podman_folder_bin\podman_profile.ps1 $podman_profile
 # ---------------------------------
 echo "Creating the internal virtual switch"
 Get-NetAdapter -Name "vEthernet (Minikube_VM)" > $null -ErrorAction 'silentlycontinue'
@@ -152,39 +153,24 @@ if ($memory_used_dynamic -ne 0)
   minikube start
   MSG_ERROR -step "starting again the VM" -return_code $?
 }
-# ---------------------------------
-echo "creating powershell profile"
-New-Item -Type File -Force $profile_podman
-MSG_ERROR -step "creating powershell profile" -return_code $?
-# ---------------------------------
-echo "writing in the profile file: " $profile_podman
-echo "& ${podman_folder_bin}\profile_check.ps1" >> $profile_podman
-echo "`$env:Path += `";${podman_folder_bin};;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`""  >> $profile_podman
-echo "Set-Alias docker podman"  >> $profile_podman
-echo "Set-Alias podman-compose ${podman_folder_bin}\podman_compose_Windows_part.ps1"  >> $profile_podman
-echo "Set-Alias minikube_save_images ${podman_folder_bin}\save_images.ps1" >> $profile_podman
-echo "Set-Alias minikube_load_images ${podman_folder_bin}\load_images.ps1" >> $profile_podman
-echo "Set-Alias copy_registry_conf ${podman_folder_bin}\copy_registry_conf.ps1" >> $profile_podman
-echo "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" >> $profile_podman
-MSG_ERROR -step "writing in the profile file: " -return_code $?
-# ---------------------------------
-# creating shortcut
-$SourceFileLocation = 'C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe'
-$args="-noexit -file $profile_podman"
-$ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\Podman_Client.lnk"
-echo "Creating the shortcut at: $ShortcutLocation"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
-$Shortcut.TargetPath = $SourceFileLocation
-$Shortcut.Arguments = $args
-$Shortcut.Save()
-MSG_ERROR -step "Creating shortcut: $ShortcutLocation" -return_code $?
 #----------------------------------
 echo "Adding the option : 'open podman here' on right click"
-start-process -wait powershell "${folder_of_installation_script}\Create_right_click_option.ps1" -verb runAs 
+start-process -wait powershell "${folder_of_installation_script}\Create_right_click_option.ps1" -verb runAs
+# ---------------------------------
+echo "creating powershell profile"
+if (Test-Path ${PROFILE})
+{
+  New-Item -Type File -Force $PROFILE
+}
+MSG_ERROR -step "creating powershell profile" -return_code $?
+# ---------------------------------
+echo "writing in the profile file: " $PROFILE
+echo "" >> $PROFILE
+cat ${folder_of_installation_script}\scripts\podman_profile.txt >> $PROFILE
+MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
 echo "loading the profile"
-& $profile_podman
+& $podman_profile
 MSG_ERROR -step "loading the profile" -return_code $?
 Write-Host "installation succeed" -ForegroundColor Green
 Write-Host "Press any key to close window..."

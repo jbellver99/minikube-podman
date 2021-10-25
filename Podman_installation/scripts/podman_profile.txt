@@ -1,0 +1,11 @@
+Write-Host "In 5 seconds the profile for podman variables will be load, if you want to skip it and just load regular user profile, press any key, if you skip it you will not be able to execute podman commands on this prompt, but you can still load it after by executing: '& C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1'" -ForegroundColor Yellow
+while( (-not $Host.UI.RawUI.KeyAvailable) -and ($secondsRunning -lt 5) ){
+    Write-Host ("Waiting for: " + (5-$secondsRunning))
+    Start-Sleep -Seconds 1
+    $secondsRunning++
+	if ($secondsRunning -eq "5")
+	{
+		echo "loading podman profile"
+		& C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1
+	}
+}

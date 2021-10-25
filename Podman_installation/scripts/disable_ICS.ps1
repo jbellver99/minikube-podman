@@ -103,3 +103,4 @@ function Set-MrInternetConnectionSharing {
 }
 
 Set-MrInternetConnectionSharing -InternetInterfaceName "Wi-Fi" -LocalInterfaceName "vEthernet (Minikube_VM)" -Enabled $false
+sleep 10

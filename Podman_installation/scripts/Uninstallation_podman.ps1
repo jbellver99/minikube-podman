@@ -10,7 +10,7 @@
 
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
-$profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_podman.ps1"
+$profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
 $ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\Podman_Client.lnk"
 
 function MSG_ERROR {
@@ -34,6 +34,13 @@ function MSG_ERROR {
 
 $date_save=$(Get-Date -Format "yyyyMMdd.HHmm")
 echo "Uninstallation of podman"
+echo "Deleting profile C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1, (there is a save under the name C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile.$($date_save) (if it still exists)"
+if (Test-Path C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1)
+{
+mv C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile.$date_save
+}
+MSG_ERROR -step "deleting profile" -return_code $?
+#-----------------------------------------
 echo "Deleting profile $profile_podman"
 if (Test-Path $profile_podman)
 {
@@ -43,19 +50,16 @@ MSG_ERROR -step "Deleting profile" -return_code $?
   Write-Host "the profile $profile_podman was not found, its removal has been skipped" -ForegroundColor Yellow
 }
 
-#-----------------------------------------------
-echo "Deleting shortcut"
-if (Test-Path $ShortcutLocation)
-{
-rm $ShortcutLocation
-MSG_ERROR -step "Deleting shortcut" -return_code $?
-}else{
-  Write-Host "the shortcut $ShortcutLocation was not found, its removal has been skipped" -ForegroundColor Yellow
-}
+
 # #------------------------------------------------
 echo "Stopping and removing the minikube VM"
 minikube delete
 MSG_ERROR -step "Removing the minikube VM" -return_code $?
+#------------------------------------------------
+
+echo "Removing ICS"
+Start-Process -wait powershell "${podman_folder_bin}\disable_ICS.ps1" -Verb runAs
+MSG_ERROR -step "Removing ICS" -return_code $?
 #------------------------------------------------
 echo "Removing podman folder"
 if (Test-Path $podman_folder_bin)
@@ -76,14 +80,11 @@ if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.
   Write-Host "The archive 'podman-remote-release-windows.zip' was not found in 'C:\Users\$($env:USERNAME)\Downloads', its removal is skipped" -ForegroundColor Yellow
 }
 
-#------------------------------------------------
-echo "Removing ICS"
-Start-Process -wait powershell "${podman_folder_bin}\disable_ICS.ps1" -Verb runAs
-MSG_ERROR -step "Removing ICS" -return_code $?
+
 
 #------------------------------------------------
 echo "Removing the virtual switch"
-Remove-VMSwitch -Name "Minikube_VM" 
+Remove-VMSwitch -Name "Minikube_VM"
 MSG_ERROR -step "Removing the virtual switch" -return_code $?
 
 #------------------------------------------------
