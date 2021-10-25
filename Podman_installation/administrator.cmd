@@ -1,0 +1,1 @@
+powershell Installation_scripts\Administrator.ps1

@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs; exit }
 function MSG_ERROR {
  param( [string]$step, $return_code)
  if ($return_code)

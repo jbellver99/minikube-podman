@@ -119,7 +119,7 @@ if (Test-Path ${podman_folder_bin}\podman.exe)
 }
 # -----------------------------------------------------
 echo "copy the podman-compose and uninstallation scripts in the podman folder"
-cp ${folder_of_installation_script}\scripts\* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
+cp ${folder_of_installation_script}\..\scripts\* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
 MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_code $?
 mv -Force $podman_folder_bin\podman_profile.ps1 $podman_profile
 # ---------------------------------
@@ -166,7 +166,7 @@ MSG_ERROR -step "creating powershell profile" -return_code $?
 # ---------------------------------
 echo "writing in the profile file: " $PROFILE
 echo "" >> $PROFILE
-cat ${folder_of_installation_script}\scripts\podman_profile.txt >> $PROFILE
+cat ${folder_of_installation_script}\..\scripts\podman_profile.txt >> $PROFILE
 MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
 echo "loading the profile"
@@ -175,3 +175,4 @@ MSG_ERROR -step "loading the profile" -return_code $?
 Write-Host "installation succeed" -ForegroundColor Green
 Write-Host "Press any key to close window..."
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
+sleep 10
