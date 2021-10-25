@@ -2,7 +2,7 @@
 $v = $?
 if ($v)
 {
-write-host "Configuration of minikube into podman loaded succesful" -ForegroundColor Green
+write-host "Configuration of minikube into podman loaded succesfully" -ForegroundColor Green
 }
 else
 {
