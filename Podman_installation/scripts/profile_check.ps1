@@ -1,8 +1,8 @@
-minikube status > $null
+& minikube -p minikube podman-env > $null
 $v = $?
 if ($v)
 {
-& minikube -p minikube podman-env | Invoke-Expression
+write-host "Configuration of minikube into podman loaded succesful" -ForegroundColor Green
 }
 else
 {
