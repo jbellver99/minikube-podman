@@ -1,1 +1,1 @@
-powershell Installation_scripts\update.ps1
+powershell Installation_scripts\update_podman.ps1

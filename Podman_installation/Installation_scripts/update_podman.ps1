@@ -3,7 +3,7 @@ $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
 $podman_folder_bin_regex=$podman_folder_bin -replace "\\","\\"
 $folder_of_update_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$scripts_folder = "${folder_of_update_script}\scripts"
+$scripts_folder = "${folder_of_update_script}\..\scripts"
 $profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
 
 function MSG_ERROR {
@@ -111,10 +111,10 @@ echo "-------------------------------------------------------------"
 #update of the profile
 if ( -not (Test-Path $profile_podman))
 {
+  $podman_save="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_before_update_podman.$date_save"
   write-host "We can see that the new podman profile has not been created yet, creating it and writting in it" -ForegroundColor DarkCyan
   echo "Modifying profile: all lines about podman are removed from the powershell profile to create a personal profile when using the shortcut for podman (a save of the profile exists here: $podman_save)"
   cat $PROFILE | Select-String "podman" > $profile_podman
-  $podman_save="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_before_update_podman.$date_save"
   mv -Force $PROFILE $podman_save
   echo "" >> $PROFILE
   cat ${scripts_folder}\podman_profile.txt >> $PROFILE
@@ -123,15 +123,39 @@ if ( -not (Test-Path $profile_podman))
 
 }
 Write-Host "Updating profile: $profile_podman" -ForegroundColor DarkCyan
-$profile_content=$(Get-content $profile_podman)
-check_line_in_profile -test_line "profile_check.ps1" -full_line "& ${podman_folder_bin}\profile_check.ps1" -content $profile_content
-check_line_in_profile -test_line '^[$env:Path]' -full_line "`$env:Path += `";${podman_folder_bin};;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`"" -content $profile_content
-check_line_in_profile -test_line "Set-Alias docker podman" -full_line "Set-Alias docker podman" -content $profile_content
-check_line_in_profile -test_line "Set-Alias podman-compose" -full_line "Set-Alias podman-compose ${podman_folder_bin}\podman_compose_Windows_part.ps1" -content $profile_content
-check_line_in_profile -test_line "Set-Alias minikube_save_images" -full_line "Set-Alias minikube_save_images ${podman_folder_bin}\save_images.ps1" -content $profile_content
-check_line_in_profile -test_line "Set-Alias minikube_load_images" -full_line "Set-Alias minikube_load_images ${podman_folder_bin}\load_images.ps1" -content $profile_content
-check_line_in_profile -test_line "Set-Alias copy_registry_conf" -full_line "Set-Alias copy_registry_conf ${podman_folder_bin}\copy_registry_conf.ps1" -content $profile_content
-check_line_in_profile -test_line "Set-Alias podman C" -full_line "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" -content $profile_content
+cp -Force ${scripts_folder}\podman_profile.ps1 $profile_podman
+$begin_line=(( Select-String -pattern "block podman begin" -path $PROFILE) -split ":")[2]
+$end_line=(( Select-String -pattern "block podman end" -path $PROFILE) -split ":")[2]
+$a=Get-Content $profile
+$podman_save2="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_without_podman"
+$a[0..($begin_line-1)] > $podman_save2
+echo "-------"
+echo "cqt podñqn_save2 1"
+cat $podman_save2
+Get-Content $profile -Tail ($a.Count - ($end_line-1)) >> $podman_save2
+echo "-------"
+echo "cqt podñqn_save2 2"
+cat $podman_save2
+Set-Content -Path $podman_save2 -Value (get-content -Path $podman_save2 | Select-String -Pattern 'block podman' -NotMatch)
+echo "-------"
+echo "cqt podñqn_save2 3"
+cat $podman_save2
+Set-Content $podman_save2 -value (Get-Content $podman_save2 | ? {$_.trim() -ne "" })
+echo "-------"
+echo "cqt podñqn_save2 4"
+cat $podman_save2
+cat $podman_save2 > $PROFILE
+rm -force $podman_save2
+cat ${scripts_folder}\podman_profile.txt >> $PROFILE
+# $profile_content=$(Get-content $profile_podman)
+# check_line_in_profile -test_line "profile_check.ps1" -full_line "& ${podman_folder_bin}\profile_check.ps1" -content $profile_content
+# check_line_in_profile -test_line '^[$env:Path]' -full_line "`$env:Path += `";${podman_folder_bin};;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts`"" -content $profile_content
+# check_line_in_profile -test_line "Set-Alias docker podman" -full_line "Set-Alias docker podman" -content $profile_content
+# check_line_in_profile -test_line "Set-Alias podman-compose" -full_line "Set-Alias podman-compose ${podman_folder_bin}\podman_compose_Windows_part.ps1" -content $profile_content
+# check_line_in_profile -test_line "Set-Alias minikube_save_images" -full_line "Set-Alias minikube_save_images ${podman_folder_bin}\save_images.ps1" -content $profile_content
+# check_line_in_profile -test_line "Set-Alias minikube_load_images" -full_line "Set-Alias minikube_load_images ${podman_folder_bin}\load_images.ps1" -content $profile_content
+# check_line_in_profile -test_line "Set-Alias copy_registry_conf" -full_line "Set-Alias copy_registry_conf ${podman_folder_bin}\copy_registry_conf.ps1" -content $profile_content
+# check_line_in_profile -test_line "Set-Alias podman C" -full_line "Set-Alias podman ${podman_folder_bin}\podman_arg_check.ps1" -content $profile_content
 
 Write-Host "The profile has been updated" -ForegroundColor DarkCyan
 echo "-------------------------------------------------------------"

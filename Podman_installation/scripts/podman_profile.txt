@@ -1,24 +1,26 @@
+#block podman begin
 $background_loading=start-job {minikube -p minikube podman-env}
 & C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1
 Write-Host "In 2 seconds the profile for podman variables will be load, if you want to skip it and just load regular user profile, press any key, if you skip it you will not be able to execute podman commands on this prompt, but you can still load it after by executing: '& C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1'" -ForegroundColor Yellow
-while( (-not $Host.UI.RawUI.KeyAvailable) -and ($secondsRunning -lt 2) ){
+while( (-not $Host.UI.RawUI.KeyAvailable) -and ($secondsRunning -lt 3) ){
     Write-Host ("Waiting for: " + (2-$secondsRunning))
     Start-Sleep -Seconds 1
     $secondsRunning++
-	if ($secondsRunning -eq "2")
-	{
-		echo "loading podman profile"
-		wait-job $background_loading > $null
-		$result_background_job= receive-job $background_loading
-		$result_background_job -match "false"
-		if($result_background_job -match "false")
-		{
-			Write-Host "Minikube has not initialized correctly. Please check if the VM has started. Once it is started execute the following command: '& minikube -p minikube podman-env | Invoke-Expression'" -ForegroundColor Red
-		}
-		else
-		{
-			write-host "Configuration of minikube into podman loaded succesfully" -ForegroundColor Green
+        if ($secondsRunning -eq "3")
+        {
+                echo "loading podman profile"
+                wait-job $background_loading > $null
+                $result_background_job= receive-job $background_loading
+                $result_background_job -match "false"
+                if($result_background_job -match "false")
+                {
+                        Write-Host "Minikube has not initialized correctly. Please check if the VM has started. Once it is started execute the following command: '& minikube -p minikube podman-env | Invoke-Expression'" -ForegroundColor Red
+                }
+                else
+                {
+                        write-host "Configuration of minikube into podman loaded succesfully" -ForegroundColor Green
       echo $result_background_job | Invoke-expression
-		}
-	}
+                }
+        }
 }
+#block podman end
