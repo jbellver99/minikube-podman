@@ -27,7 +27,13 @@ echo "-----------------------------------------------------"
 if ($RET)
 {
   echo "All changes were made sucessfully, you need to restart your computer to apply them"
-  Write-Host "Press any key to close window..."
+  $user_input = Read-Host -Prompt "Would you like to restart now ? (Type 'Y' for 'Yes' or 'N' for no)"
+  if ($user_input -eq 'Y')
+  {
+    Restart-Computer
+  }else {
+    Write-Host "Press any key to close window..."
+  }
 }else{
   write-Host "the command to add user in the Hyper Administrators group has failed, if the error shown above tells you that the group does not exist, it may be because of the language of your computer, in this case execute this command:" -ForegroundColor Yellow
   echo "    ([adsi]`"WinNT://./<Hyper-V Administrators>,group`").Add(`"WinNT://$env:UserDomain/$env:Username,user`")"
