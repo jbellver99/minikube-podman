@@ -15,6 +15,7 @@ param( [int]$memory=0, [int]${storage}=0)
 #intialazing variables
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
+$podman_folder_conf="${podman_folder}\conf"
 $folder_of_installation_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $memory_used_dynamic=0
 $podman_profile="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
@@ -104,24 +105,38 @@ else
 	New-Item -Type directory "$podman_folder_bin"
 	MSG_ERROR -step "creating $podman_folder and $podman_folder_bin" -return_code $?
 }
+if (Test-Path $podman_folder_conf)
+{
+	echo "directory already exists, step skipped"
+}
+else
+{
+	New-Item -Type directory "$podman_folder_conf"
+	MSG_ERROR -step "creating $podman_folder_conf" -return_code $?
+}
 # ---------------------------------
 if (Test-Path ${podman_folder_bin}\podman.exe)
 {
   echo "The podman.exe file already exists, skipping the donwload of the archive"
 }else{
-  echo "downloading the Podman archive"
+  echo "Downloading the Podman archive"
   Invoke-WebRequest -Uri https://github.com/containers/podman/releases/download/v2.2.1/podman-remote-release-windows.zip -OutFile C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip
-  MSG_ERROR -step "downloading the Podman archive" -return_code $?
+  MSG_ERROR -step "Downloading the Podman archive" -return_code $?
   # ---------------------------------------------------------
-  echo "extracting podman archive"
+  echo "Extracting podman archive"
   Expand-Archive "C:\Users\$($env:USERNAME)\Downloads\podman-remote-release-windows.zip" -DestinationPath "$podman_folder_bin"
-  MSG_ERROR -step "extracting podman archive" -return_code $?
+  MSG_ERROR -step "Extracting podman archive" -return_code $?
 }
 # -----------------------------------------------------
-echo "copy the podman-compose and uninstallation scripts in the podman folder"
-cp ${folder_of_installation_script}\..\scripts\* $podman_folder_bin ; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder}
-MSG_ERROR -step "copy the podman-compose scripts in the podman folder" -return_code $?
-mv -Force $podman_folder_bin\podman_profile.ps1 $podman_profile
+echo "Copy the functions into the bin scripts"
+cp ${folder_of_installation_script}\..\bin\* $podman_folder_bin
+MSG_ERROR -step "Copy conf files into the conf folder" -return_code $?
+cp ${folder_of_installation_script}\..\conf\* $podman_folder_conf
+MSG_ERROR -step "Copy conf files into the conf folder" -return_code $?
+cp -Force ${folder_of_installation_script}\..\profile\podman_profile.ps1 $podman_profile
+cp -Force ${folder_of_installation_script}\Uninstallation_podman.ps1 $podman_folder
+MSG_ERROR -step "Copy Uninstallation Script" -return_code $?
+
 # ---------------------------------
 echo "Creating the internal virtual switch"
 Get-NetAdapter -Name "vEthernet (Minikube_VM)" > $null -ErrorAction 'silentlycontinue'
@@ -133,7 +148,7 @@ if ($v)
 else
 {
     New-VMSwitch -Name "Minikube_VM" -SwitchType Internal
-    Start-Process -wait powershell "${podman_folder_bin}\enable_ICS.ps1" -Verb runAs
+    Start-Process -wait powershell "${folder_of_installation_script}\enable_ICS.ps1" -Verb runAs
     MSG_ERROR -step "Creating the internal virtual switch" -return_code $?
 }
 # ---------------------------------
@@ -166,7 +181,7 @@ MSG_ERROR -step "creating powershell profile" -return_code $?
 # ---------------------------------
 echo "writing in the profile file: " $PROFILE
 echo "" >> $PROFILE
-cat ${folder_of_installation_script}\..\scripts\podman_profile.txt >> $PROFILE
+cat ${folder_of_installation_script}\..\profile\podman_profile.txt >> $PROFILE
 MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
 echo "loading the profile"

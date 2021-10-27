@@ -10,6 +10,7 @@
 
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
+$podman_folder_conf="${podman_folder}\conf"
 $profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
 $ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\Podman_Client.lnk"
 
@@ -34,10 +35,18 @@ function MSG_ERROR {
 
 $date_save=$(Get-Date -Format "yyyyMMdd.HHmm")
 echo "Uninstallation of podman"
-echo "Deleting profile C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1, (there is a save under the name C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile.$($date_save) (if it still exists)"
+echo "Removing the lines for podman into $PROFILE"
 if (Test-Path C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1)
 {
-mv C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1 C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile.$date_save
+  $begin_line=(( Select-String -pattern "block podman begin" -path $PROFILE) -split ":")[2]
+  $end_line=(( Select-String -pattern "block podman end" -path $PROFILE) -split ":")[2]
+  $a=Get-Content $profile
+  $podman_save2="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\profile_without_podman"
+  $a[0..($begin_line-1)] > $podman_save2
+  Get-Content $profile -Tail ($a.Count - ($end_line-1)) >> $podman_save2
+  Set-Content -Path $podman_save2 -Value (get-content -Path $podman_save2 | Select-String -Pattern 'block podman' -NotMatch)
+  Set-Content $podman_save2 -value (Get-Content $podman_save2 | ? {$_.trim() -ne "" })
+  cat $podman_save2 > $PROFILE
 }
 MSG_ERROR -step "deleting profile" -return_code $?
 #-----------------------------------------
@@ -65,9 +74,11 @@ echo "Removing podman folder"
 if (Test-Path $podman_folder_bin)
 {
   rm -r $podman_folder_bin
-  MSG_ERROR -step "removing podman" -return_code $?
+  MSG_ERROR -step "Removing podman bin folder" -return_code $?
+  rm -r $podman_folder_conf
+  MSG_ERROR -step "Removing podman conf folder" -return_code $?
 }else{
-  Write-Host "the folder $podman_folder_bin was not found, its removal has been skipped" -ForegroundColor Yellow
+  Write-Host "The folder $podman_folder_bin was not found, its removal has been skipped" -ForegroundColor Yellow
 }
 
 #------------------------------------------------
@@ -90,7 +101,7 @@ MSG_ERROR -step "Removing the virtual switch" -return_code $?
 #------------------------------------------------
 echo "Removing the key in the registry to remove the option 'open podman here'"
 start-process -wait powershell "rm HKCU:\SOFTWARE\Classes\Directory\Background\shell\podman -R" -verb runAs
-MSG_ERROR -step "removing the key in the registry to remove the option 'open podman here'" -return_code $?
+MSG_ERROR -step "Removing the key in the registry to remove the option 'open podman here'" -return_code $?
 Write-Host "Uninstallation succeded" -ForegroundColor Green
 Write-Host "Press any key to close window..."
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null

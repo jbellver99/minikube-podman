@@ -3,7 +3,8 @@ $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
 $podman_folder_bin_regex=$podman_folder_bin -replace "\\","\\"
 $folder_of_update_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$scripts_folder = "${folder_of_update_script}\..\scripts"
+$scripts_folder = "${folder_of_update_script}\..\bin"
+$conf_folder = "${folder_of_update_script}\..\conf"
 $profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
 
 function MSG_ERROR {
@@ -26,45 +27,28 @@ function MSG_ERROR {
 }
 
 function Check_copy_file {
- param( [string]$filename)
- if ((Test-Path ${podman_folder_bin}\${filename}) -and (-not ($filename -match ".conf$")))
+ param( [string]$filename, [string]$foldername)
+ if ((Test-Path ${podman_folder}\${foldername}\${filename}) -and (-not ($filename -match ".conf$")))
  {
-   $compare=$(compare-object (get-content ${podman_folder_bin}\${filename}) (get-content ${scripts_folder}\${filename}))
+   $compare=$(compare-object (get-content ${podman_folder}\${foldername}\${filename}) (get-content ${folder_of_update_script}\..\${foldername}\${filename}))
    if ($compare.length -ne 0)
    {
-     echo "Changes detected with the file ${filename}, copying it into the bin directory: ${podman_folder_bin}"
-     cp -Force ${scripts_folder}\${filename} ${podman_folder_bin}
-     MSG_ERROR -step "copying ${filename} into the bin directory: ${podman_folder_bin}" -return_code $?
-     if ($filename -match "Uninstallation_podman")
-     {
-       mv -Force ${podman_folder_bin}\${filename} $podman_folder
-     }
+     echo "Changes detected with the file ${filename}, copying it into the bin directory: ${podman_folder}\${foldername}"
+     cp -Force ${folder_of_update_script}\..\${foldername}\${filename} ${podman_folder}\${foldername}
+     MSG_ERROR -step "Copying ${filename} into the bin directory: ${podman_folder}\${foldername}" -return_code $?
    }else{
      echo "No changes detected for the file: ${filename}, skipping its copy"
    }
- }elseif (-not (Test-Path ${podman_folder_bin}\${filename})){
-   echo "the file $filename does not exist in ${podman_folder_bin}, copying it inside the folder"
-   cp -Force ${scripts_folder}\${filename} ${podman_folder_bin}
-   MSG_ERROR -step "copying ${filename} into the bin directory: ${podman_folder_bin}" -return_code $?
- }elseif ((Test-Path ${podman_folder_bin}\${filename}) -and ($filename -match ".conf")){
+ }elseif (-not (Test-Path ${podman_folder}\${foldername}\${filename})){
+   echo "the file $filename does not exist in ${podman_folder}\${foldername}, copying it inside the folder"
+   echo "cp -Force ${podman_folder}\${filename} ${podman_folder}\${foldername}"
+   cp -Force ${podman_folder}\${filename} ${podman_folder}\${foldername}
+   MSG_ERROR -step "copying ${filename} into the bin directory: ${podman_folder}\${foldername}" -return_code $?
+ }elseif ((Test-Path ${podman_folder}\${foldername}\${filename}) -and ($filename -match ".conf")){
    Write-host "Note: the file: $filename is skipped because it is a conf file that already exists" -ForegroundColor Yellow
  }
 }
 
-function check_line_in_profile
-{
-  param( [string]$test_line, [string]$full_line, $content)
-  $test=$(echo $content | Select-string "$test_line")
-  if ($test.length -eq 0)
-  {
-    echo "$full_line" >> $profile_podman
-    MSG_ERROR -step "Adding the line about '$test_line' into the profile: $profile_podman" -return_code $?
-  }else{
-    echo "Line about '$test_line' already exists"
-  }
-
-
-}
 
 echo "Before starting to update, be sure to have close the folder containing the already installed podman, then press any key to continue"
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
@@ -103,9 +87,16 @@ Write-Host "Updating every script" -ForegroundColor DarkCyan
 $file_list=$(ls $scripts_folder | Select-object -ExpandProperty Name)
 Foreach ($i in $file_list)
 {
-  Check_copy_file -filename $i
+  Check_copy_file -filename $i -foldername bin
 }
 Write-Host "All scripts have been updated" -ForegroundColor DarkCyan
+Write-Host "Updating every conf file if needed" -ForegroundColor DarkCyan
+$file_list=$(ls $conf_folder | Select-object -ExpandProperty Name)
+Foreach ($i in $file_list)
+{
+  Check_copy_file -filename $i -foldername conf
+}
+Write-Host "All conf files have been updated" -ForegroundColor DarkCyan
 echo "-------------------------------------------------------------"
 
 #update of the profile
@@ -117,13 +108,13 @@ if ( -not (Test-Path $profile_podman))
   cat $PROFILE | Select-String "podman" > $profile_podman
   mv -Force $PROFILE $podman_save
   echo "" >> $PROFILE
-  cat ${scripts_folder}\podman_profile.txt >> $PROFILE
+  cat ${scripts_folder}..\profile\podman_profile.txt >> $PROFILE
   cat $podman_save  | Select-String "podman" -NotMatch > $podman_profile
   write-host "NOTE: Now to use podman you need to execute the shortcut: $ShortcutLocation, just opening a powershell prompt will not work"
 
 }
 Write-Host "Updating profile: $profile_podman" -ForegroundColor DarkCyan
-cp -Force ${scripts_folder}\podman_profile.ps1 $profile_podman
+cp -Force ${folder_of_update_script}\..\profile\podman_profile.ps1 $profile_podman
 $begin_line=(( Select-String -pattern "block podman begin" -path $PROFILE) -split ":")[2]
 $end_line=(( Select-String -pattern "block podman end" -path $PROFILE) -split ":")[2]
 $a=Get-Content $profile
@@ -137,10 +128,12 @@ Set-Content -Path $podman_save2 -Value (get-content -Path $podman_save2 | Select
 Set-Content $podman_save2 -value (Get-Content $podman_save2 | ? {$_.trim() -ne "" })
 
 cat $podman_save2 > $PROFILE
+cat ${folder_of_update_script}\..\profile\podman_profile.txt >> $PROFILE
 rm -force $podman_save2
 
 Write-Host "The profile has been updated" -ForegroundColor DarkCyan
 echo "-------------------------------------------------------------"
+cp -Force ${folder_of_update_script}\Uninstallation_podman.ps1 $podman_folder
 Write-Host "the update has succeed" -ForegroundColor Green
 Write-Host "Press any key to close window..."
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
