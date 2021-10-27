@@ -1,6 +1,12 @@
 #block podman begin
+$env:Path += ";C:\Users\$($env:USERNAME)\AppData\Roaming\podman-2.2.1\bin;;C:\Users\$($env:USERNAME)\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts"
+Set-Alias docker podman
+Set-Alias podman-compose C:\Users\$($env:USERNAME)\AppData\Roaming\podman-2.2.1\bin\podman_compose_Windows_part.ps1
+Set-Alias minikube_save_images C:\Users\$($env:USERNAME)\AppData\Roaming\podman-2.2.1\bin\save_images.ps1
+Set-Alias minikube_load_images C:\Users\$($env:USERNAME)\AppData\Roaming\podman-2.2.1\bin\load_images.ps1
+Set-Alias copy_registry_conf C:\Users\$($env:USERNAME)\AppData\Roaming\podman-2.2.1\bin\copy_registry_conf.ps1
+Set-Alias podman C:\Users\$($env:USERNAME)\AppData\Roaming\podman-2.2.1\bin\podman_arg_check.ps1
 $background_loading=start-job {minikube -p minikube podman-env}
-& C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1
 Write-Host "In 2 seconds the profile for podman variables will be load, if you want to skip it and just load regular user profile, press any key, if you skip it you will not be able to execute podman commands on this prompt, but you can still load it after by executing: '& C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1'" -ForegroundColor Yellow
 while( (-not $Host.UI.RawUI.KeyAvailable) -and ($secondsRunning -lt 3) ){
     Write-Host ("Waiting for: " + (2-$secondsRunning))
