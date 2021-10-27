@@ -1,1 +1,0 @@
-powershell Installation_scripts\installation_podman.ps1
