@@ -1,2 +1,2 @@
-powershell Installation_scripts\Administrator.ps1
+powershell scripts\setup_environment.ps1
 timeout 5
