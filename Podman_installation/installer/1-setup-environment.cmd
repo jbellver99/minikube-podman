@@ -1,1 +1,2 @@
 powershell Installation_scripts\Administrator.ps1
+timeout 5

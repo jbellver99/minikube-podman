@@ -4,13 +4,13 @@ Start-Process "powershell.exe" "-c minikube mount '${absolute_path}:/tmp_${relat
 $test=0
 while ($test -eq 0)
 {
-	echo "checking if share is done ..."
+	echo "Checking if share is done ..."
 	minikube ssh "[ -f /tmp_${relative_path}/Dockerfile ] && exit 0 || exit 1 "
 	if ($?)
 	{
 		$test=1
 	}else{
-		echo "share is not sucessful yet, checking again in some seconds"
+		echo "Share is not sucessful yet, checking again in some seconds"
 		echo "--"
 		sleep 2
 	}

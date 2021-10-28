@@ -17,9 +17,9 @@ function MSG_ERROR {
  }
  else
  {
-	Write-Host "a problem occured in the step: $step" -ForegroundColor Red
-	Write-Host "stopping the script..." -ForegroundColor Red
-	Write-Host "the update has failed" -ForegroundColor Red
+	Write-Host "A problem occured in the step: $step" -ForegroundColor Red
+	Write-Host "Stopping the script..." -ForegroundColor Red
+	Write-Host "The update has failed" -ForegroundColor Red
 	Write-Host "Press any key to close window..."
 	($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
 	exit
@@ -40,9 +40,8 @@ function Check_copy_file {
      echo "No changes detected for the file: ${filename}, skipping its copy"
    }
  }elseif (-not (Test-Path ${podman_folder}\${foldername}\${filename})){
-   echo "the file $filename does not exist in ${podman_folder}\${foldername}, copying it inside the folder"
-   echo "cp -Force ${podman_folder}\${filename} ${podman_folder}\${foldername}"
-   cp -Force ${podman_folder}\${filename} ${podman_folder}\${foldername}
+   echo "The file $filename does not exist in ${podman_folder}\${foldername}, copying it inside the folder"
+   cp -Force ${folder_of_update_script}\..\${foldername}\${filename} ${podman_folder}\${foldername}
    MSG_ERROR -step "copying ${filename} into the bin directory: ${podman_folder}\${foldername}" -return_code $?
  }elseif ((Test-Path ${podman_folder}\${foldername}\${filename}) -and ($filename -match ".conf")){
    Write-host "Note: the file: $filename is skipped because it is a conf file that already exists" -ForegroundColor Yellow
@@ -68,7 +67,7 @@ if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman.exe)
   }
   cp -Force C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\* $podman_folder_bin; if ($?) {mv -Force ${podman_folder_bin}\Uninstallation_podman.ps1 $podman_folder }
   MSG_ERROR -step "Moving the binaries from C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\* to $podman_folder_bin " -return_code $?
-  echo "replacing the paths in the profile: $PROFILE"
+  echo "Replacing the paths in the profile: $PROFILE"
   $content=$(Get-content $PROFILE)
   $new_content=$content -replace "C:\\Users\\$($env:USERNAME)\\Downloads\\podman-2.2.1" ,"${podman_folder_bin}"
   $check=$(echo $new_content | Select-String -Pattern "$podman_folder_bin_regex")
@@ -83,6 +82,16 @@ if (Test-Path C:\Users\$($env:USERNAME)\Downloads\podman-2.2.1\podman.exe)
 }
 
 #Update of every script
+echo "Creating conf folder"
+if (Test-Path $podman_folder\conf)
+{
+	echo "Directory already exists, step skipped"
+}
+else
+{
+	New-Item -Type directory "$podman_folder\conf"
+	MSG_ERROR -step "Creating $podman_folder\conf" -return_code $?
+}
 Write-Host "Updating every script" -ForegroundColor DarkCyan
 $file_list=$(ls $scripts_folder | Select-object -ExpandProperty Name)
 Foreach ($i in $file_list)
@@ -97,6 +106,14 @@ Foreach ($i in $file_list)
   Check_copy_file -filename $i -foldername conf
 }
 Write-Host "All conf files have been updated" -ForegroundColor DarkCyan
+
+foreach ($i in 'containers.conf','registries.conf','enable_ICS.ps1','podman_profile.txt' )
+{
+  if (Test-Path ${podman_folder_bin}\$i)
+  {
+    rm -force ${podman_folder_bin}\$i
+  }
+}
 echo "-------------------------------------------------------------"
 
 #update of the profile
@@ -134,6 +151,6 @@ rm -force $podman_save2
 Write-Host "The profile has been updated" -ForegroundColor DarkCyan
 echo "-------------------------------------------------------------"
 cp -Force ${folder_of_update_script}\Uninstallation_podman.ps1 $podman_folder
-Write-Host "the update has succeed" -ForegroundColor Green
+Write-Host "The update has succeed" -ForegroundColor Green
 Write-Host "Press any key to close window..."
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null

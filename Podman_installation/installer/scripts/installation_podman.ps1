@@ -45,7 +45,7 @@ if ($args -contains "-d" -and $memory -ne 0)
   $memory_used=1800
 }elseif ($args -contains "-d" -and $memory -eq 0) {
   echo "The '-d' flag has been detected, the VM will be created with dynamic memory, the minimum value will be 1800, as the 'memory' flag has not beed given,"
-  echo "the max value will be calculated depending of the available memory you have (Note: you need to have more than 8Gb on your computer for that, if not, 1800 will be chosen)"
+  echo "The max value will be calculated depending of the available memory you have (Note: you need to have more than 8Gb on your computer for that, if not, 1800 will be chosen)"
   $memory_used_dynamic=$(((((Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).sum - 8gb) /1mb), 1800 | Measure -Max).Maximum)
   $memory_used=1800
 }elseif ($memory -eq 0 -and -not ($args -contains "-d"))
@@ -69,7 +69,7 @@ if ($memory_used -lt 1800)
 if ($args -contains "-d" -and $memory_used -ge $memory_used_dynamic)
 {
   Write-Host "You tried to setup the dynamic memory with a maximum value lower or equal the the minimum" -ForegroundColor Red
-  echo "minimum value: $memory_used , maximum value: $memory_used_dynamic   (in MB)"
+  echo "Minimum value: $memory_used , maximum value: $memory_used_dynamic   (in MB)"
   Write-Host "If you did not set yourself the max value, that means you do not have more than 8GB of RAM, and we advise you to use the static memory" -ForegroundColor Yellow
   Write-Host "Press any key to close window..."
 	($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
@@ -80,25 +80,25 @@ function MSG_ERROR {
  param( [string]$step, $return_code)
  if ($return_code)
  {
-	Write-Host "step: $step has succeed" -ForegroundColor Green
+	Write-Host "Step: $step has succeed" -ForegroundColor Green
 	echo "--"
 	echo ""
  }
  else
  {
-	Write-Host "a problem occured in the step: $step" -ForegroundColor Red
-	Write-Host "stopping the script..." -ForegroundColor Red
-	Write-Host "the installation has failed" -ForegroundColor Red
+	Write-Host "A problem occured in the step: $step" -ForegroundColor Red
+	Write-Host "Stopping the script..." -ForegroundColor Red
+	Write-Host "The installation has failed" -ForegroundColor Red
 	Write-Host "Press any key to close window..."
 	($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
 	exit
  }
 }
 
-echo "creating $podman_folder and $podman_folder_bin"
+echo "Creating $podman_folder and $podman_folder_bin"
 if (Test-Path $podman_folder_bin)
 {
-	echo "directory already exists, step skipped"
+	echo "Directory already exists, step skipped"
 }
 else
 {
@@ -107,7 +107,7 @@ else
 }
 if (Test-Path $podman_folder_conf)
 {
-	echo "directory already exists, step skipped"
+	echo "Directory already exists, step skipped"
 }
 else
 {
@@ -152,7 +152,7 @@ else
     MSG_ERROR -step "Creating the internal virtual switch" -return_code $?
 }
 # ---------------------------------
-echo "starting minikube.."
+echo "Starting minikube.."
 
 minikube start --driver=hyperv --container-runtime=cri-o --cpus 4 --memory $memory_used --disk-size $storage_used --hyperv-virtual-switch "Minikube_VM"
 
@@ -172,22 +172,21 @@ if ($memory_used_dynamic -ne 0)
 echo "Adding the option : 'open podman here' on right click"
 start-process -wait powershell "${folder_of_installation_script}\Create_right_click_option.ps1" -verb runAs
 # ---------------------------------
-echo "creating powershell profile"
+echo "Creating powershell profile"
 if (Test-Path ${PROFILE})
 {
   New-Item -Type File -Force $PROFILE
 }
 MSG_ERROR -step "creating powershell profile" -return_code $?
 # ---------------------------------
-echo "writing in the profile file: " $PROFILE
+echo "Writing in the profile file: " $PROFILE
 echo "" >> $PROFILE
 cat ${folder_of_installation_script}\..\profile\podman_profile.txt >> $PROFILE
 MSG_ERROR -step "writing in the profile file: " -return_code $?
 # ---------------------------------
-echo "loading the profile"
+echo "Loading the profile"
 & $podman_profile
 MSG_ERROR -step "loading the profile" -return_code $?
-Write-Host "installation succeed" -ForegroundColor Green
+Write-Host "Installation succeed" -ForegroundColor Green
 Write-Host "Press any key to close window..."
 ($Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")) > $null
-sleep 10
