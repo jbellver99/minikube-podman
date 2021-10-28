@@ -1,2 +1,2 @@
-powershell scripts\installation_podman.ps1
+powershell scripts\setup_minikube.ps1
 timeout 5
