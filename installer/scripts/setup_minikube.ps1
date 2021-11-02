@@ -134,8 +134,8 @@ MSG_ERROR -step "Copy conf files into the conf folder" -return_code $?
 cp ${folder_of_installation_script}\..\conf\* $podman_folder_conf
 MSG_ERROR -step "Copy conf files into the conf folder" -return_code $?
 cp -Force ${folder_of_installation_script}\..\profile\podman_profile.ps1 $podman_profile
-cp -Force ${folder_of_installation_script}\Uninstallation_podman.ps1 $podman_folder
-MSG_ERROR -step "Copy Uninstallation Script" -return_code $?
+cp -Force ${folder_of_installation_script}\uninstall.ps1 $podman_folder
+MSG_ERROR -step "Copy Uninstall Script" -return_code $?
 
 # ---------------------------------
 echo "Creating the internal virtual switch"
