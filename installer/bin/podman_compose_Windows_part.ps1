@@ -26,7 +26,6 @@ $podman_folder_bin="${podman_folder}\bin"
 if ($args -contains '-h' -or $args -contains '--help')
 {
 	echo "Temporary solution to use podman-compose with a windows podman configured with minikube, waiting for podman3 included in minikube."
-	echo "As a "minikube stop" delete all images existing, this couple of script exist to replace the use of minikube stop/start"
 	echo "It creates a unix container with podman and podman-compose installed, generated the commands in the container, and execute them in the VM"
 	echo "This script is part of 3 scripts, one in powershell (this one) which is the master script,"
 	echo "2 in bash, one of them is for the command for the VM and the other for the container"
