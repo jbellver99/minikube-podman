@@ -11,6 +11,7 @@
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
 $podman_folder_conf="${podman_folder}\conf"
+$podman_folder_helpers="${podman_folder}\helpers"
 $profile_podman="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
 $ShortcutLocation = "C:\Users\$($env:USERNAME)\Desktop\Podman_Client.lnk"
 
@@ -67,7 +68,7 @@ MSG_ERROR -step "Removing the minikube VM" -return_code $?
 #------------------------------------------------
 
 echo "Removing ICS"
-Start-Process -wait powershell "${podman_folder_bin}\disable_ICS.ps1" -Verb runAs
+Start-Process -wait powershell "${podman_folder_helpers}\disable_ICS.ps1" -Verb runAs
 MSG_ERROR -step "Removing ICS" -return_code $?
 #------------------------------------------------
 echo "Removing podman folder"
@@ -77,6 +78,8 @@ if (Test-Path $podman_folder_bin)
   MSG_ERROR -step "Removing podman bin folder" -return_code $?
   rm -r $podman_folder_conf
   MSG_ERROR -step "Removing podman conf folder" -return_code $?
+  rm -r $podman_folder_helpers
+  MSG_ERROR -step "Removing podman helpers folder" -return_code $?
 }else{
   Write-Host "The folder $podman_folder_bin was not found, its removal has been skipped" -ForegroundColor Yellow
 }

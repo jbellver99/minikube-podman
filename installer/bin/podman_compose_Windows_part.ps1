@@ -23,6 +23,7 @@
 ######################################################################################################
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
+$podman_folder_helpers="${podman_folder}\helpers"
 if ($args -contains '-h' -or $args -contains '--help')
 {
 	echo "Temporary solution to use podman-compose with a windows podman configured with minikube, waiting for podman3 included in minikube."
@@ -89,7 +90,7 @@ echo "Copying current directory into the tmp folder"
 cp -r -Force . C:\Users\$($env:USERNAME)\tmp_share_windows
 MSG_ERROR -step "Copying current directory into the tmp folder" -return_code $?
 echo "Copying bash scripts in the same folder"
-cp ${podman_folder_bin}\*.bash C:\Users\$($env:USERNAME)\tmp_share_windows
+cp ${podman_folder_helpers}\*.bash C:\Users\$($env:USERNAME)\tmp_share_windows
 MSG_ERROR -step "Copying bash scripts in the same folder" -return_code $?
 echo "Copying the key to connect to the VM from the container"
 $path=$(minikube ssh-key)
@@ -105,7 +106,7 @@ if ( $args -contains '-m' -Or $args -contains '-u' )
 	MSG_ERROR -step "Starting the sharing of directory between the host and the VM in another powershell prompt" -return_code $?
 	echo "Even if this is shown has succesfully, please check the new powershell prompt that has been opened"
 	echo "After the end of this script you can decide to stop sharing the directory, for that, ctrl+c on the prompt of the sharing process"
-	echo "You can also keep it open, so you don't need to use the -c flag next use"
+	echo "You can also keep it open, so you don't need to use the -m flag next use"
 	echo "Waiting 30 sec for the sharing to be done..."
 	sleep 30
 }

@@ -16,6 +16,7 @@ param( [int]$memory=0, [int]${storage}=0)
 $podman_folder="${ENV:APPDATA}\podman-2.2.1"
 $podman_folder_bin="${podman_folder}\bin"
 $podman_folder_conf="${podman_folder}\conf"
+$podman_folder_helpers="${podman_folder}\helpers"
 $folder_of_installation_script = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 $memory_used_dynamic=0
 $podman_profile="C:\Users\$($env:USERNAME)\Documents\WindowsPowerShell\podman_profile.ps1"
@@ -114,6 +115,15 @@ else
 	New-Item -Type directory "$podman_folder_conf"
 	MSG_ERROR -step "creating $podman_folder_conf" -return_code $?
 }
+if (Test-Path $podman_folder_helpers)
+{
+	echo "Directory already exists, step skipped"
+}
+else
+{
+	New-Item -Type directory "$podman_folder_helpers"
+	MSG_ERROR -step "creating $podman_folder_helpers" -return_code $?
+}
 # ---------------------------------
 if (Test-Path ${podman_folder_bin}\podman.exe)
 {
@@ -128,13 +138,14 @@ if (Test-Path ${podman_folder_bin}\podman.exe)
   MSG_ERROR -step "Extracting podman archive" -return_code $?
 }
 # -----------------------------------------------------
-echo "Copy the functions into the bin scripts"
 cp ${folder_of_installation_script}\..\bin\* $podman_folder_bin
-MSG_ERROR -step "Copy conf files into the conf folder" -return_code $?
+MSG_ERROR -step "Copy the functions into the bin scripts" -return_code $?
 cp ${folder_of_installation_script}\..\conf\* $podman_folder_conf
 MSG_ERROR -step "Copy conf files into the conf folder" -return_code $?
+cp ${folder_of_installation_script}\..\helpers\* $podman_folder_conf
+MSG_ERROR -step "Copy helpers files into the helpers folder" -return_code $?
 cp -Force ${folder_of_installation_script}\..\profile\podman_profile.ps1 $podman_profile
-cp -Force ${folder_of_installation_script}\Uninstallation_podman.ps1 $podman_folder
+cp -Force ${folder_of_installation_script}\uninstall.ps1 $podman_folder
 MSG_ERROR -step "Copy Uninstallation Script" -return_code $?
 
 # ---------------------------------
@@ -148,7 +159,7 @@ if ($v)
 else
 {
     New-VMSwitch -Name "Minikube_VM" -SwitchType Internal
-    Start-Process -wait powershell "${folder_of_installation_script}\enable_ICS.ps1" -Verb runAs
+    Start-Process -wait powershell "${folder_of_installation_script}\..\helpers\enable_ICS.ps1" -Verb runAs
     MSG_ERROR -step "Creating the internal virtual switch" -return_code $?
 }
 # ---------------------------------
@@ -170,7 +181,7 @@ if ($memory_used_dynamic -ne 0)
 }
 #----------------------------------
 echo "Adding the option : 'open podman here' on right click"
-start-process -wait powershell "${folder_of_installation_script}\Create_right_click_option.ps1" -verb runAs
+start-process -wait powershell "${folder_of_installation_script}\..\helpers\Create_right_click_option.ps1" -verb runAs
 # ---------------------------------
 echo "Creating powershell profile"
 if (Test-Path ${PROFILE})
