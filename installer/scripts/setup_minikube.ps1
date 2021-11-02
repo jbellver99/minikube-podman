@@ -146,11 +146,7 @@ cp ${folder_of_installation_script}\..\helpers\* $podman_folder_conf
 MSG_ERROR -step "Copy helpers files into the helpers folder" -return_code $?
 cp -Force ${folder_of_installation_script}\..\profile\podman_profile.ps1 $podman_profile
 cp -Force ${folder_of_installation_script}\uninstall.ps1 $podman_folder
-<<<<<<< HEAD
 MSG_ERROR -step "Copy Uninstallation Script" -return_code $?
-=======
-MSG_ERROR -step "Copy Uninstall Script" -return_code $?
->>>>>>> aeecf3f44e8bc55f9acc2e8c948dce953e5183bd
 
 # ---------------------------------
 echo "Creating the internal virtual switch"
