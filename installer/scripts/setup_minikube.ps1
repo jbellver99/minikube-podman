@@ -142,7 +142,7 @@ cp ${folder_of_installation_script}\..\bin\* $podman_folder_bin
 MSG_ERROR -step "Copy the functions into the bin scripts" -return_code $?
 cp ${folder_of_installation_script}\..\conf\* $podman_folder_conf
 MSG_ERROR -step "Copy conf files into the conf folder" -return_code $?
-cp ${folder_of_installation_script}\..\helpers\* $podman_folder_conf
+cp ${folder_of_installation_script}\..\helpers\* $podman_folder_helpers
 MSG_ERROR -step "Copy helpers files into the helpers folder" -return_code $?
 cp -Force ${folder_of_installation_script}\..\profile\podman_profile.ps1 $podman_profile
 cp -Force ${folder_of_installation_script}\uninstall.ps1 $podman_folder
