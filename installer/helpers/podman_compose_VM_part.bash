@@ -37,6 +37,7 @@ then
 	exit 1
 fi
 }
+args_used=$(echo $@ | sed "s/$1 $2//g")
 echo -e "${yellow} Begining of the script executed on the VM"
 echo -e "${white}"
 echo -e "Starting the podman-compose container"
@@ -45,10 +46,10 @@ MSG_ERROR "Starting the podman-compose container" $?
 echo "Inside the VM: cd to the copy of the app folder in the shared folder"
 cd /tmp_shared_VM/$1
 echo "Changing the format from windows to unix"
-dos2unix docker-compose.yml
+dos2unix ./*.yml
 MSG_ERROR "Changing the format from windows to unix" $?
 echo "Connection into the container to execute the podman-compose command"
-podman exec podman_compose_tmp bash "/tmp_shared_VM/podman_compose_container_part.bash" "$1" "$2"
+podman exec podman_compose_tmp bash "/tmp_shared_VM/podman_compose_container_part.bash" "$1" "$2" "$args_used"
 MSG_ERROR "Connection into the container to execute the podman-compose command" $?
 echo "Stopping and deleting the temporary container for podman_compose"
 podman rm podman_compose_tmp -f

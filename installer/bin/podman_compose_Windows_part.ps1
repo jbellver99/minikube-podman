@@ -109,8 +109,16 @@ if ( $args -contains '-m' -Or $args -contains '-u' )
 	echo "Waiting 30 sec for the sharing to be done..."
 	sleep 30
 }
+$tmp_args = $args -replace '-m' , ''
+$tmp_args2 = $tmp_args -replace '-u' , ''
+$true_args = $tmp_args2 -replace '-d' , ''
+$length_args = $($true_args.Length)
 echo "Executing the bash script on the VM"
+if ($length_args -eq 0) { 
 minikube ssh "[ -d /tmp_bis ] && sudo rm -rf /tmp_bis; sudo mkdir /tmp_bis;sudo cp /tmp_shared_VM/podman_compose_VM_part.bash /tmp_bis/podman_compose_VM_part.bash ;sudo chmod 777 /tmp_bis/podman_compose_VM_part.bash ;sudo su - root -c '/tmp_bis/podman_compose_VM_part.bash $relative_path $(minikube ip)'"
+} else{ 
+minikube ssh "[ -d /tmp_bis ] && sudo rm -rf /tmp_bis; sudo mkdir /tmp_bis;sudo cp /tmp_shared_VM/podman_compose_VM_part.bash /tmp_bis/podman_compose_VM_part.bash ;sudo chmod 777 /tmp_bis/podman_compose_VM_part.bash ;sudo su - root -c '/tmp_bis/podman_compose_VM_part.bash $relative_path $(minikube ip) $true_args'"
+}
 $RET=$?
 echo $RET
 MSG_ERROR -step "Executing the bash script on the VM" -return_code $RET

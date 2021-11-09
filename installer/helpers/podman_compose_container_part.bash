@@ -34,7 +34,7 @@ then
 	exit 1
 fi
 }
-
+args_used=$(echo $@ | sed "s/$1 $2//g")
 echo -e "${yellow} Begining of the script executed on the container"
 echo -e "${white}"
 sed -i 's/mountPoint/Mountpoint/g' /usr/local/lib/python3.9/site-packages/podman_compose.py
@@ -51,10 +51,10 @@ echo -e "${blue}Executing the podman-compose up -d command"
 echo -e "${yellow} Please be careful of logs for podman-compose up -d because the command can contain error but the final output can be succesful, please verify the logs messages"
 echo -e "${blue}"
 echo
+echo "podman-compose up $3 -d"
 echo
 echo
-echo
-podman-compose up -d #> /tmp_shared_VM/command_tmp.sh
+podman-compose $args_used up  -d #> /tmp_shared_VM/command_tmp.sh
 echo
 echo
 echo
