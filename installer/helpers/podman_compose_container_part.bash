@@ -51,7 +51,7 @@ echo -e "${blue}Executing the podman-compose up -d command"
 echo -e "${yellow} Please be careful of logs for podman-compose up -d because the command can contain error but the final output can be succesful, please verify the logs messages"
 echo -e "${blue}"
 echo
-echo "podman-compose up $3 -d"
+echo "podman-compose $3 -d"
 echo
 echo
 podman-compose $args_used up  -d #> /tmp_shared_VM/command_tmp.sh
