@@ -1,3 +1,6 @@
+NOTE: The development of this solution has moved to https://github.com/devonfw-forge/podman-minikube[devonfw-forge/podman-minikube]. +
+This repository will remain available some time to avoid broken links.
+
 = Podman/Minikube/CRI-O as Docker Desktop alternative
 
 You are a few steps far from moving away from Docker Desktop to a much powerful free alternative, which will enable you to introduce Kubernetes in your development environment if desired, or continue working as normal with plain Docker-like containers.
