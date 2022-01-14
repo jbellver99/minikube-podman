@@ -40,14 +40,13 @@ echo -e "${white}"
 sed -i 's/mountPoint/Mountpoint/g' /usr/local/lib/python3.9/site-packages/podman_compose.py
 sed -i 's/self\.podman_path, \*podman_args/self.podman_path,"--remote", *podman_args/g' /usr/local/lib/python3.9/site-packages/podman_compose.py
 echo "Adding the remote connection to podman inside the container so that every command will be executed in the VM and not in the container"
-echo "test: $2"
 podman system connection add test --socket-path /run/podman/podman.sock --identity /tmp_shared_VM/id_rsa docker@$2
 MSG_ERROR "Adding the remote connection to podman inside the container" $?
 podman system connection list
 echo "Inside the container: cd to the copy of the app folder in the shared folder"
 cd /tmp_shared_VM/$1
 MSG_ERROR "cd to the copy of the app folder in the shared folder" $?
-echo -e "${blue}Executing the podman-compose up -d command"
+echo -e "${blue}Executing the podman-compose command"
 echo -e "${yellow} Please be careful of logs for podman-compose up -d because the command can contain error but the final output can be succesful, please verify the logs messages"
 echo -e "${blue}"
 echo
