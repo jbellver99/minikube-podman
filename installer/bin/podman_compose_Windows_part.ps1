@@ -60,7 +60,13 @@ function MSG_ERROR {
  }
 }
 
-
+if ( $args -contains 'down')
+{
+	echo "The podman-compose down function has still have not been implemented, it will be coming on future version, instead use:"
+	echo "		'podman pod rm -f <name_of_your_pod>'"
+	echo "To find the name of your pod you can you can use 'podman pod ls'"
+	exit
+}
 echo "Start of the podman-copose temporary script"
 
 if ( $args -contains '-u')
