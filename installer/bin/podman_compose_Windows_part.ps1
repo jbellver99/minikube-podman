@@ -30,8 +30,11 @@ if ($args -contains '-h' -or $args -contains '--help')
 	echo "It creates a unix container with podman and podman-compose installed, generated the commands in the container, and execute them in the VM"
 	echo "This script is part of 3 scripts, one in powershell (this one) which is the master script,"
 	echo "2 in bash, one of them is for the command for the VM and the other for the container"
+	echo "Syntax:"
+	echo "		'podman-compose [optionals arguments] up' if you want to create your stack"
+	echo "		'podman-compose [optionals arguments] down' if you want to stop and delete your stack (feature not activated yet)"
 	echo "--"
-	echo "arguments:"
+	echo "Optionals arguments:"
 	echo "			-m:	if you need to share a volume between the VM and the windows host (if you launch this script for the first time this is mandatory)"
 	echo "				It will open another powershell prompt to run the process of sharing the folder that will still run after the script,"
 	echo "				as long as you don't kill th eprocess or close the prompt, the sharing will keep going"
@@ -40,6 +43,7 @@ if ($args -contains '-h' -or $args -contains '--help')
 	echo "				this error can happen when the directory shared between the windows host and the VM is corrupted,"
 	echo "				the process of sharing must be killed (close the prompt that has been open when you executed this script with the -m flag)"
 	echo "				you can use it with the -m flag but this flag will activate it automatically"
+	echo "			-f <file>: Mention it if the configuration file is not 'docker-compose.yml'"
 	exit
 }
 
@@ -60,8 +64,25 @@ function MSG_ERROR {
  }
 }
 
+if ( $args -contains 'down')
+{
+	echo "The podman-compose down function has still have not been implemented, it will be coming on future version, instead use:"
+	echo "		'podman pod rm -f <name_of_your_pod>'"
+	echo "To find the name of your pod you can you can use 'podman pod ls'"
+	exit
+}
+$tmp_args = $args -replace '-m' , ''
+$tmp_args2 = $tmp_args -replace '-u' , ''
+$true_args = $tmp_args2 -replace '-d' , ''
+$length_args = $($true_args.Length)
 
 echo "Start of the podman-copose temporary script"
+if (-not ($args -contains 'up' -or $args -contains 'down')) { 
+	Write-Host "You have not put 'up' or 'down' in your argument, please check your command." -ForegroundColor red
+	echo "Reminder of the syntax:"
+	echo "podman-compose [optional: -f <file> -m -u] up/down"
+	exit 1
+}
 
 if ( $args -contains '-u')
 {
@@ -109,8 +130,9 @@ if ( $args -contains '-m' -Or $args -contains '-u' )
 	echo "Waiting 30 sec for the sharing to be done..."
 	sleep 30
 }
+
 echo "Executing the bash script on the VM"
-minikube ssh "[ -d /tmp_bis ] && sudo rm -rf /tmp_bis; sudo mkdir /tmp_bis;sudo cp /tmp_shared_VM/podman_compose_VM_part.bash /tmp_bis/podman_compose_VM_part.bash ;sudo chmod 777 /tmp_bis/podman_compose_VM_part.bash ;sudo su - root -c '/tmp_bis/podman_compose_VM_part.bash $relative_path $(minikube ip)'"
+minikube ssh "[ -d /tmp_bis ] && sudo rm -rf /tmp_bis; sudo mkdir /tmp_bis;sudo cp /tmp_shared_VM/podman_compose_VM_part.bash /tmp_bis/podman_compose_VM_part.bash ;sudo chmod 777 /tmp_bis/podman_compose_VM_part.bash ;sudo su - root -c '/tmp_bis/podman_compose_VM_part.bash $relative_path $(minikube ip) $true_args'"
 $RET=$?
 echo $RET
 MSG_ERROR -step "Executing the bash script on the VM" -return_code $RET
